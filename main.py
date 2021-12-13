@@ -14,11 +14,10 @@ class Game():
         self.color = "light blue"
 
         self.root = pygame.display.set_mode([self.root_width, self.root_width])
-        self.xlocations = []
-        self.ylocations = []
+        self.xlocations = self.ylocations = []
 
-        self.squence = [(20, 20), (20, 220)]
-        self.check_choices = []
+        self.queqe = {(20, 20), (190, 20)}
+        self.comparison = set()
 
     def draw_rect(self):
         for row in range(int(self.num**(1/2))): #0
@@ -31,13 +30,10 @@ class Game():
                     self.root, self.color, 
                     (self.x, self.y, self.width, self.width))
                 
-                self.xlocations.append(
-                    (self.x, self.x + self.width)
-                )
+                self.xlocations.append((self.x, self.x + self.width))
 
                 self.ylocations.append(
-                    (self.space*(row+1) + row*self.width, self.space*(row+1) + row*self.width + self.width)
-                )
+                    (self.space*(row+1) + row*self.width, self.space*(row+1) + row*self.width + self.width))
 
     def mouse_loc(self):
         self.li = [False, False]
@@ -54,50 +50,37 @@ class Game():
 
     def pick(self):
         if self.mouse_loc() and pygame.mouse.get_pressed()[0]:
-            try :
+            try:
                 x = int(self.mouse_loc()[0][0])
                 y = int(self.mouse_loc()[1][0])
                 pygame.draw.rect(self.root, "green", (x, y, self.width, self.width))
-                
-                self.check_choices.append((x, y))
-                print(self.check_choices)
-                self.check()
+                self.comparison.add((x, y))
+                print(self.queqe)
+                print(self.comparison)
+                self.check(self.comparison)
             except:
-                pass
+                print("pick doğru çalışmadı")
 
-    def turn_on_in_order(self, level):
-        for i in range(level):
-            rx, ry = random.choice(list(set(self.xlocations)))[0], random.choice(list(set(self.ylocations)))[0]
-            print(rx, ry)
-            pygame.draw.rect(self.root, "red", (rx, ry, self.width, self.width))
-            pygame.time.delay(1000)
-
-    def check(self):
-        if self.check_choices == self.squence:
+    def check(self, comparison):
+        if len(comparison) == len(self.queqe) and comparison == self.queqe:
             print("Tamamdır")
 
-game = Game(680, 9)
+    def highlight(self):
+        pass
+
+
+game = Game(360, 4)
 clock = pygame.time.Clock()
 
 run = True
 while run:
 
-    clock.tick(20)
+    clock.tick(15)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if all(game.mouse_loc()) and pygame.mouse.get_pressed()[0]:
-                print(pygame.mouse.get_pos())
-                print(game.mouse_loc())
-        
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                game.turn_on_in_order(3)
-
     game.draw_rect()
     game.pick()
-    game.check()
     pygame.display.update()
