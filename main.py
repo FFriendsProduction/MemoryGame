@@ -14,12 +14,13 @@ class Game():
         self.color = "light blue"
 
         self.root = pygame.display.set_mode([self.root_width, self.root_width])
+        pygame.display.set_caption("Memory Game")        
         self.xlocations = self.ylocations = []
 
-        self.queqe = {(20, 20), (190, 20)}
+        self.queqe = self.create_path()
         self.comparison = set()
 
-    def draw_rect(self):
+    def draw_rect(self, color):
         for row in range(int(self.num**(1/2))): #0
             for column in range(int(self.num**(1/2))): #0
 
@@ -27,7 +28,7 @@ class Game():
                 self.y = self.space*(row+1) + row*self.width
                 
                 pygame.draw.rect(
-                    self.root, self.color, 
+                    self.root, color, 
                     (self.x, self.y, self.width, self.width))
                 
                 self.xlocations.append((self.x, self.x + self.width))
@@ -53,7 +54,7 @@ class Game():
             try:
                 x = int(self.mouse_loc()[0][0])
                 y = int(self.mouse_loc()[1][0])
-                pygame.draw.rect(self.root, "green", (x, y, self.width, self.width))
+                pygame.draw.rect(self.root, "pink", (x, y, self.width, self.width))
                 self.comparison.add((x, y))
                 print(self.queqe)
                 print(self.comparison)
@@ -61,26 +62,46 @@ class Game():
             except:
                 print("pick doğru çalışmadı")
 
+    def create_path(self):
+        self.sett = set()
+        for row in range(int(self.num**(1/2))): #0
+            for column in range(int(self.num**(1/2))): #0
+
+                self.x =self.space*(column+1) + column*self.width
+                self.y = self.space*(row+1) + row*self.width
+            
+                self.sett.add((int(self.x), int(self.y)))
+        print(self.sett)
+        return self.sett
+
     def check(self, comparison):
         if len(comparison) == len(self.queqe) and comparison == self.queqe:
             print("Tamamdır")
+            self.reset_path()
+            self.highlight()
 
     def highlight(self):
-        pass
+        self.draw_rect("green")
 
+    def reset_path(self):
+        self.comparison.clear()
 
-game = Game(360, 4)
+game = Game(600, 4)
 clock = pygame.time.Clock()
 
 run = True
 while run:
-
     clock.tick(15)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                game.reset_path()
+                game.highlight()
 
-    game.draw_rect()
+    game.draw_rect(game.color)
     game.pick()
     pygame.display.update()
